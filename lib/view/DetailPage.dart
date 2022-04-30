@@ -1,13 +1,8 @@
 
-
 import 'package:flutter/material.dart';
-
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/sparkcharts.dart';
-
 import '../model/DatabaseModel.dart';
 class DetailPage extends StatefulWidget {
-
   DetailPage({Key? key, required this.details}) : super(key: key);
   final List<LeafDetails>? details;
   @override

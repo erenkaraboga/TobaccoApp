@@ -13,16 +13,101 @@ class PostData extends StatefulWidget {
 }
 class _PostDataState extends State<PostData> {
   late RequestService serviceHelper;
-
   double? CCT=0.0;
   String? textCCT="__";
-
   String? url ="";
   File? image;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     serviceHelper= RequestService();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      key: scaffoldKey,
+      body: Column(
+        children: [
+          Form(
+            child: Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20,),
+                  InkWell(
+                      onTap: (){
+                        _showChoiceDialog(context);
+                      },
+                      child: ImagePickerCircleButton
+                  ),
+                  const SizedBox(height: 30),
+                  SendButton(),
+                  const SizedBox(height: 30),
+                  Card(
+                  shadowColor: Colors.green,
+                    child: Text("CCT = " + textCCT.toString(),textAlign: TextAlign.values.first,style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  InkWell SendButton() {
+    return InkWell(
+                  onTap: (){
+                    if(image!=null){
+                      var uploadResult=serviceHelper.uploadImage(image);
+                      uploadResult.then((value) => {
+                        url=value.url
+                      });
+                      var CCTresult = serviceHelper.calculateCCT(image);
+                      CCTresult.then((value) => {
+                        if(value.cct!>0){
+                          setState(() {
+                            CCT = value.cct;
+                            textCCT=value.cct.toString();
+                          }),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Calculated Succesfuly"))),
+                          serviceHelper.createDetail(1, CCT!, url!, DateTime.now())
+                        }
+                        else{
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Error")))
+                        }});
+                    }else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Resim Seçiniz")));
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                    padding:  EdgeInsetsDirectional.fromSTEB(35, 10, 35, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.green
+                    ),
+                    child: Text("Analysis",style: TextStyle(color: Colors.white,fontSize: 15),),
+                  ),
+    );
+  }
+
+  Future getImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if(pickedFile==null){
+      image=null;
+    }
+    final tempImage= File(pickedFile!.path);
+    setState(() {
+      image = tempImage;
+      Navigator.pop(context);
+    });
   }
   Future<void>_showChoiceDialog(BuildContext context)
   {
@@ -54,54 +139,6 @@ class _PostDataState extends State<PostData> {
         ),
       );
     });
-  }
-  Future getImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if(pickedFile==null){
-      image=null;
-    }
-    final tempImage= File(pickedFile!.path);
-    setState(() {
-      image = tempImage;
-      Navigator.pop(context);
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Tobacco"),backgroundColor: Colors.green,),
-      resizeToAvoidBottomInset: false,
-      key: scaffoldKey,
-      body: Column(
-        children: [
-          Form(
-            child: Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20,),
-                  InkWell(
-                      onTap: (){
-                        _showChoiceDialog(context);
-                      },
-                      child: ImagePickerCircleButton
-                  ),
-                  const SizedBox(height: 30),
-                  SendIconButton,
-                  Card(
-                  shadowColor: Colors.green,
-                    child: Text("CCT = " + textCCT.toString(),textAlign: TextAlign.values.first,style: const TextStyle(
-                      fontSize: 20,
-
-                    ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
   Card get ImagePickerCircleButton{
     return Card(
@@ -137,38 +174,5 @@ class _PostDataState extends State<PostData> {
         )
     );
   }
-  IconButton get SendIconButton{
-    return  IconButton(
-        iconSize: 60,
-        onPressed: (){
-          if(image!=null){
-            var uploadResult=serviceHelper.uploadImage(image);
-            uploadResult.then((value) => {
-              url=value.url
-            });
-            var CCTresult = serviceHelper.calculateCCT(image);
-            CCTresult.then((value) => {
-              if(value.cct!>0){
-                setState(() {
-                  CCT = value.cct;
-                  textCCT=value.cct.toString();
-                }),
-                scaffoldKey.currentState?.showSnackBar(
-                    const SnackBar(content: Text("Calculated Succesfuly"))),
-                    serviceHelper.createDetail(1, CCT!, url!, DateTime.now())
-              }
-              else{
-                scaffoldKey.currentState?.showSnackBar(
-                const SnackBar(content: Text("Error")))
-              }
-            }
-            );
-          }else{
-            scaffoldKey.currentState?.showSnackBar(
-                const SnackBar(content: Text("Resim Seçiniz")));
-          }
-        },
-        icon: Image.asset("assets/icons/calculator.png",height: 50,width: 60,)
-    );
-  }
+
 }
