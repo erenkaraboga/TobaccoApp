@@ -13,6 +13,7 @@ class PostData extends StatefulWidget {
 }
 class _PostDataState extends State<PostData> {
   late RequestService serviceHelper;
+  late TextEditingController nameController;
   double? CCT=0.0;
   String? textCCT="__";
   String? url ="";
@@ -21,6 +22,7 @@ class _PostDataState extends State<PostData> {
   @override
   void initState() {
     serviceHelper= RequestService();
+    nameController=TextEditingController();
   }
   @override
   Widget build(BuildContext context) {

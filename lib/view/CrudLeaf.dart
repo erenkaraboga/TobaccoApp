@@ -1,6 +1,7 @@
 
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:tobaccov2/view/HomePage.dart';
@@ -15,17 +16,20 @@ class _GetDataState extends State<GetData>with AutomaticKeepAliveClientMixin {
   late RequestService service;
   List<LeafDetails>? leafDetails;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final formKey = GlobalKey<FormState>();
+  late TextEditingController nameController;
   @override
   void initState() {
    service=new RequestService();
-    super.initState();
+   nameController=TextEditingController();
+   super.initState();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(centerTitle:true,title: Text("Quality Grade of Tobacco"),backgroundColor: Colors.green,),
-      floatingActionButton: floatingActionButton,
+      floatingActionButton: customFloatButton(context),
       body: FutureBuilder<List<LeafModel>?>(
         future: service.getData(),
         builder: (context, snap){
@@ -88,16 +92,69 @@ class _GetDataState extends State<GetData>with AutomaticKeepAliveClientMixin {
       ),
     );
   }
-  FloatingActionButton get floatingActionButton{
-    return FloatingActionButton(
-      backgroundColor: Colors.green,
-      child: const Icon(Icons.refresh),
-      onPressed:(){
-        setState(() {
 
-        });
-      },
+  SpeedDial customFloatButton(BuildContext context) {
+    return SpeedDial(
+      animatedIcon:AnimatedIcons.menu_close,
+      overlayOpacity: 0,
+      backgroundColor: Colors.green,
+      children: [
+        SpeedDialChild(
+          onTap: (){
+            setState(() {
+            });
+          },
+          child: Icon(Icons.refresh),
+          backgroundColor: Colors.green.shade300
+        ),
+        SpeedDialChild(
+          onTap: (){
+            _createLeafDialog(context);
+          },
+          backgroundColor: Colors.green.shade100,
+          child: Icon(Icons.add),
+        ),
+      ],
+
     );
+  }
+  Future<void>_createLeafDialog(BuildContext context)
+  {
+    return showDialog(context: context,builder: (BuildContext context){
+      return AlertDialog(
+        title: Text("Leaf Name ? ",style: TextStyle(color: Colors.green),),
+        content:Form(
+          key: formKey,
+          child: TextFormField(
+            autofocus: true,
+            cursorColor: Colors.green,
+            controller: nameController,
+            validator: (val){
+              if(val!.isEmpty){
+                return "It cant be Empty";
+              }
+              else{
+                return null;
+              }
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: (){
+            if(formKey.currentState!.validate()){
+              var result = service.createLeaf(nameController.text);
+              result.then((value) => {
+                if(value!){
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Created"))),
+              setState(() {
+                Navigator.pop(context);
+              })}
+              });
+            }
+          }, child: Text("CREATE"))
+        ],
+      );
+    });
   }
   @override
   //Scroll işlemi için..
