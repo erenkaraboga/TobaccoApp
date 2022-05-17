@@ -2,9 +2,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:tobaccov2/view/CrudLeaf.dart';
-void main()  {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initialization(null);
   HttpOverrides.global = MyHttpOverrides();
   runApp(MyApp());
+}
+
+Future initialization(BuildContext? context)async {
+ await Future.delayed(Duration(milliseconds: 500));
 }
 class MyHttpOverrides extends HttpOverrides{
   @override

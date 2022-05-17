@@ -75,6 +75,7 @@ class _PostDataState extends State<PostData> {
                             CCT = value.cct;
                             textCCT=value.cct.toString();
                           }),
+
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Calculated Succesfuly"))),
                           serviceHelper.createDetail(1, CCT!, url!, DateTime.now())
@@ -127,7 +128,6 @@ class _PostDataState extends State<PostData> {
                 title: Text("Gallery"),
                 leading: Icon(Icons.account_box,color: Colors.green,),
               ),
-
               Divider(height: 1,color: Colors.green,),
               ListTile(
                 onTap: (){
@@ -167,7 +167,6 @@ class _PostDataState extends State<PostData> {
                   backgroundImage: AssetImage('assets/icons/leaves.png',
                   ),
                     radius: 70,
-
                 )
 
             ),
