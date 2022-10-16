@@ -1,4 +1,3 @@
-
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +7,25 @@ import '../main.dart';
 import '../model/DatabaseModel.dart';
 import 'CrudLeaf.dart';
 import 'PostImage.dart';
+
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.details, required this.appBarname,}) : super(key: key);
+  const HomePage({
+    Key? key,
+    required this.details,
+    required this.appBarname,
+    required this.leafId
+  }) : super(key: key);
   final List<LeafDetails>? details;
   final String appBarname;
+  final int leafId;
   @override
   State<HomePage> createState() => _HomePageState();
 }
-Future main()async {
+
+Future main() async {
   runApp(const MyApp());
 }
+
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -30,16 +38,15 @@ class _HomePageState extends State<HomePage> {
             indicatorColor: Colors.green,
             tabs: [
               Tab(text: 'Take'),
-              Tab(text: 'History',),
+              Tab(
+                text: 'History',
+              ),
             ],
           ),
-          title: Text(widget.appBarname),
+          title: const Text("Tobacco"),
         ),
         body: TabBarView(
-          children: [
-            PostData(),
-            DetailPage(details: widget.details)
-          ],
+          children: [ PostData(leafId: widget.leafId), DetailPage(details: widget.details)],
         ),
       ),
     );
